@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alex Styles - Graphic Designer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Navigation -->
@@ -18,9 +18,9 @@
                 <span></span>
             </button>
             <ul class="nav-links">
-                <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="#about" class="nav-link" data-tooltip="Learn more about Alex">About</a></li>
+                <li><a href="#portfolio" class="nav-link" data-tooltip="See my work">Portfolio</a></li>
+                <li><a href="#contact" class="nav-link" data-tooltip="Contact me">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -79,7 +79,7 @@
                 and strategic thinking.
             </p>
             <div class="portfolio-grid">
-                <div class="portfolio-item">
+                <div class="portfolio-item" data-modal-title="Brand Identity Design" data-modal-description="Complete brand identity system including logo design, color palette, typography guidelines, and brand applications for a tech startup. Includes mockups, brand book, and digital assets." data-modal-image="Project Image Placeholder">
                     <div class="portfolio-image">
                         Project Image Placeholder
                     </div>
@@ -89,10 +89,10 @@
                             Complete brand identity system including logo design, color palette, 
                             typography guidelines, and brand applications for a tech startup.
                         </p>
-                        <a href="#" class="portfolio-link">View Project</a>
+                        <button class="portfolio-link cta-button" type="button">View Project</button>
                     </div>
                 </div>
-                <div class="portfolio-item">
+                <div class="portfolio-item" data-modal-title="Website Redesign" data-modal-description="Modern website redesign focusing on user experience and conversion optimization for an e-commerce platform. Features responsive layouts, custom illustrations, and interactive elements." data-modal-image="Project Image Placeholder">
                     <div class="portfolio-image">
                         Project Image Placeholder
                     </div>
@@ -102,10 +102,10 @@
                             Modern website redesign focusing on user experience and conversion 
                             optimization for an e-commerce platform.
                         </p>
-                        <a href="#" class="portfolio-link">View Project</a>
+                        <button class="portfolio-link cta-button" type="button">View Project</button>
                     </div>
                 </div>
-                <div class="portfolio-item">
+                <div class="portfolio-item" data-modal-title="Print Campaign" data-modal-description="Multi-format print campaign including posters, brochures, and magazine advertisements for a luxury fashion brand. Emphasis on high-impact visuals and cohesive messaging." data-modal-image="Project Image Placeholder">
                     <div class="portfolio-image">
                         Project Image Placeholder
                     </div>
@@ -115,8 +115,18 @@
                             Multi-format print campaign including posters, brochures, and 
                             magazine advertisements for a luxury fashion brand.
                         </p>
-                        <a href="#" class="portfolio-link">View Project</a>
+                        <button class="portfolio-link cta-button" type="button">View Project</button>
                     </div>
+                </div>
+            </div>
+            <!-- Modal for Portfolio Details -->
+            <div id="portfolio-modal" class="modal" aria-hidden="true">
+                <div class="modal-overlay" tabindex="-1"></div>
+                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                    <button class="modal-close" aria-label="Close modal">&times;</button>
+                    <div class="modal-image" id="modal-image"> </div>
+                    <h3 class="modal-title" id="modal-title"></h3>
+                    <p class="modal-description" id="modal-description"></p>
                 </div>
             </div>
         </div>
@@ -213,6 +223,51 @@
                 navLinks.classList.remove('active');
                 mobileMenuButton.classList.remove('active');
             });
+        });
+
+        // Tooltips for nav links
+        document.querySelectorAll('.nav-link[data-tooltip]').forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                let tooltip = document.createElement('div');
+                tooltip.className = 'custom-tooltip';
+                tooltip.innerText = this.getAttribute('data-tooltip');
+                document.body.appendChild(tooltip);
+                const rect = this.getBoundingClientRect();
+                tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+                tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + window.scrollY + 'px';
+                this._tooltip = tooltip;
+            });
+            link.addEventListener('mouseleave', function() {
+                if (this._tooltip) {
+                    document.body.removeChild(this._tooltip);
+                    this._tooltip = null;
+                }
+            });
+        });
+
+        // Modal functionality for portfolio
+        const modal = document.getElementById('portfolio-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+        const modalImage = document.getElementById('modal-image');
+        document.querySelectorAll('.portfolio-link').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const item = this.closest('.portfolio-item');
+                modalTitle.textContent = item.getAttribute('data-modal-title');
+                modalDescription.textContent = item.getAttribute('data-modal-description');
+                modalImage.textContent = item.getAttribute('data-modal-image');
+                modal.setAttribute('aria-hidden', 'false');
+                modal.classList.add('active');
+            });
+        });
+        document.querySelector('.modal-close').addEventListener('click', closeModal);
+        document.querySelector('.modal-overlay').addEventListener('click', closeModal);
+        function closeModal() {
+            modal.setAttribute('aria-hidden', 'true');
+            modal.classList.remove('active');
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
         });
 
         // Form submission
